@@ -40,6 +40,26 @@ The SPA picks the browser-local storage adapter only when the API is
 unreachable entirely (e.g. `vite dev` without the backend), so UI-only mode
 still works but keeps data in the browser.
 
+## Configuration (.env)
+
+Compose reads a `.env` file next to `compose.yaml` automatically. Copy the
+template and fill in your values — `.env` is gitignored:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Purpose |
+|---|---|
+| `LLM_BASE_URL` | Qwen endpoint, OpenAI-compatible base (`…/v1`) |
+| `LLM_API_KEY` | Bearer key for the endpoint |
+| `LLM_MODEL` | Model name the endpoint serves |
+| `LOCAL_USER` | Dev identity when no proxy header is present |
+| `POSTGRES_PASSWORD` | Database password (defaults match compose) |
+
+In-cluster, the three `LLM_*` values move to an OpenShift Secret mounted as
+env on the Deployment — same names, no code change.
+
 ## Layout
 
 | Piece | Where |

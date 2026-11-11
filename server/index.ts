@@ -10,6 +10,8 @@ import express from 'express'
 import pg from 'pg'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { generateAnnouncement, llmStatus } from './llm.ts'
+import type { DraftContent, Tone } from '../src/types.ts'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -57,7 +59,7 @@ api.get('/whoami', (req, res) => {
   res.json({ user: currentUser(req) })
 })
 
-api.get('/items', async (req, res, next) => {
+api.get('/items', async (_req, res, next) => {
   try {
     const { rows } = await pool.query('SELECT doc FROM promotion_items ORDER BY doc->>\'updatedAt\' DESC')
     res.json(rows.map((r) => r.doc))
@@ -71,6 +73,59 @@ api.get('/items/:id', async (req, res, next) => {
     const { rows } = await pool.query('SELECT doc FROM promotion_items WHERE id = $1', [req.params.id])
     if (rows.length === 0) return res.status(404).json({ error: 'not found' })
     res.json(rows[0].doc)
+  } catch (e) {
+    next(e)
+  }
+})
+api.get('/llm/status', async (_req, res, next) => {
+  try {
+    res.json(await llmStatus())
+  } catch (e) {
+    next(e)
+  }
+})
+
+api.post('/items/:id/generate', async (req, res, next) => {
+  try {
+    currentUser(req)
+    const { rows } = await pool.query('SELECT doc FROM promotion_items WHERE id = $1', [req.params.id])
+    if (rows.length === 0) return res.status(404).json({ error: 'not found' })
+    const item = rows[0].doc
+    if (typeof item !== 'object' || item === null || !('draft' in item)) {
+      return res.status(400).json({ error: 'item has no draft' })
+    }
+    const draft: unknown = item.draft
+    if (typeof draft !== 'object' || draft === null) {
+      return res.status(400).json({ error: 'item has no draft' })
+    }
+
+    // Tone: request body overrides the draft's stored tone; default serious.
+    let tone: Tone = 'serious'
+    const requested = req.body ?? {}
+    if ('tone' in requested && typeof requested.tone === 'string') {
+      if (requested.tone === 'fun-quirky' || requested.tone === 'concise' || requested.tone === 'serious') {
+        tone = requested.tone
+      }
+    } else if (
+      'basics' in draft &&
+      typeof draft.basics === 'object' &&
+      draft.basics !== null &&
+      'tone' in draft.basics &&
+      typeof draft.basics.tone === 'string'
+    ) {
+      const stored = draft.basics.tone
+      if (stored === 'fun-quirky' || stored === 'concise') tone = stored
+    }
+
+    const result = await generateAnnouncement(tone, draft as DraftContent)
+    const generatedAt = new Date().toISOString()
+    const updated = { ...item, generated: { ...result, tone, generatedAt }, updatedAt: generatedAt }
+    await pool.query(
+      `INSERT INTO promotion_items (id, doc) VALUES ($1, $2)
+       ON CONFLICT (id) DO UPDATE SET doc = $2, updated_at = now()`,
+      [req.params.id, JSON.stringify(updated)],
+    )
+    res.json(updated.generated)
   } catch (e) {
     next(e)
   }

@@ -11,6 +11,16 @@ export interface PromotionItem {
   /** Slack post URL, required to leave `ready` (finalize). */
   slackUrl: string
   draft: DraftContent
+  /** Latest AI-generated announcement (spec: #3). */
+  generated?: Generated
+}
+
+export interface Generated {
+  topLevelPost: string
+  threadReply: string
+  gaps: { field: string; message: string }[]
+  tone: Tone
+  generatedAt: string
 }
 
 export type ItemStatus = 'pending' | 'draft' | 'ready' | 'done'

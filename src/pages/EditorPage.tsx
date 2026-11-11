@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   ActionGroup,
   Alert,
@@ -50,6 +50,7 @@ function JumpLink({ field }: { field: string }) {
 
 export default function EditorPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [item, setItem] = useState<PromotionItem | null>(null)
   const [dirty, setDirty] = useState(false)
   const [savedAt, setSavedAt] = useState<string | null>(null)
@@ -183,12 +184,27 @@ export default function EditorPage() {
         <Button variant="secondary" onClick={() => handleSave()} isDisabled={!dirty}>
           Save
         </Button>
+        {dirty && (
+          <Button
+            variant="primary"
+            onClick={() => {
+              void handleSave().then(() => navigate(`/items/${item.id}/generate`))
+            }}
+          >
+            Generate announcement
+          </Button>
+        )}
+        {!dirty && (
+          <Link to={`/items/${item.id}/generate`}>
+            <Button variant="primary">{item.generated ? 'View announcement' : 'Generate announcement'}</Button>
+          </Link>
+        )}
         {item.status === 'ready' ? (
           <Button variant="primary" onClick={openPromote}>
             Promote (add Slack URL)
           </Button>
         ) : (
-          <Button variant="primary" onClick={runGate}>
+          <Button variant="secondary" onClick={runGate}>
             Ready to promote
           </Button>
         )}

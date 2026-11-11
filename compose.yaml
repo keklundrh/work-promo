@@ -3,7 +3,7 @@ services:
     image: quay.io/sclorg/postgresql-16-c9s:latest
     environment:
       POSTGRESQL_USER: workpromo
-      POSTGRESQL_PASSWORD: workpromo
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD:-workpromo}
       POSTGRESQL_DATABASE: workpromo
     volumes:
       - pgdata:/var/lib/pgsql/data
@@ -22,9 +22,12 @@ services:
       PGPORT: "5432"
       PGDATABASE: workpromo
       PGUSER: workpromo
-      PGPASSWORD: workpromo
-      # Local stand-in for the OAuth proxy: name the dev user
-      LOCAL_USER: karl
+      PGPASSWORD: ${POSTGRES_PASSWORD:-workpromo}
+      LOCAL_USER: ${LOCAL_USER:-karl}
+      # LLM (spec #3): model, URI, key. In-cluster these come from a Secret.
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://mock-llm:9999/v1}
+      LLM_API_KEY: ${LLM_API_KEY:-mock-key}
+      LLM_MODEL: ${LLM_MODEL:-mock-qwen}
     ports:
       - "8080:8080"
     depends_on:
