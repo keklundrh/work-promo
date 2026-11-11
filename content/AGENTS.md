@@ -1,28 +1,32 @@
 # AGENTS.md — Rules for AI-assisted announcement writing
+Scope: this file governs AI agents working on announcement content under `content/`.
+Folders with a different agent purpose (e.g. application code) get their own
+AGENTS.md; the nearest AGENTS.md to the files being edited wins.
 
 This repository produces internal product-promotion announcements for **Slack**.
-An AI agent reads raw material in `drafts/`, applies a template from `templates/`,
-and produces a finished announcement in `announcements/`, using `examples/` as the
-standard for what "good" looks like.
+An AI agent reads raw material in `content/drafts/`, applies a template from
+`content/templates/`, and produces a finished announcement in
+`content/announcements/`, using `content/examples/` as the standard for what
+"good" looks like.
 
 ## Repository layout
 
 | Folder | Contents | Rules |
 |---|---|---|
-| `examples/` | Real announcements that performed well (numbered `NNN.md`) | Read-only reference. Never edit or delete. |
-| `templates/` | Blank templates per tone: serious, fun-quirky, concise | Read-only scaffolding. Never edit unless asked. |
-| `drafts/` | Drafts + the authoring guide `00-draft-template.md` (not an announcement; never process it) | Scratch space. Agents may create and edit files here. |
-| `announcements/` | Finished, ready-to-post announcements | Final output only. Never leave placeholders or TBD here. |
+| `content/examples/` | Real announcements that performed well (numbered `NNN.md`) | Read-only reference. Never edit or delete. |
+| `content/templates/` | Blank templates per tone: serious, fun-quirky, concise | Read-only scaffolding. Never edit unless asked. |
+| `content/drafts/` | Drafts + the authoring guide `00-draft-template.md` (not an announcement; never process it) | Scratch space. Agents may create and edit files here. |
+| `content/announcements/` | Finished, ready-to-post announcements | Final output only. Never leave placeholders or TBD here. |
 
 ## Workflow
 
-1. **Read the brief.** Start with the draft file the user points to in `drafts/`.
+1. **Read the brief.** Start with the draft file the user points to in `content/drafts/`.
    If the user names no draft, ask which one.
 2. **Pick a template.** Match tone to content; see [Tone selection](#tone-selection).
    If the user specifies a tone, it wins.
 3. **Study one or two examples** of the same shape before writing (see the example
    index below). Match their structure and voice, not their content.
-4. **Write the announcement** into `announcements/` using the file format below.
+4. **Write the announcement** into `content/announcements/` using the file format below.
 5. **Check against the quality bar** before presenting it.
 6. Announce the result: file path, template used, and any gaps the user must fill.
 
@@ -69,14 +73,14 @@ When tone is ambiguous, default to **serious** and say so.
 
 ## File format
 
-- `drafts/`: one file per topic, any structure the author likes.
-- `announcements/YYYY-MM-DD-<slug>.md`, e.g. `announcements/2026-11-11-ai-quickstarts-launch.md`.
+- `content/drafts/`: one file per topic, any structure the author likes.
+- `content/announcements/YYYY-MM-DD-<slug>.md`, e.g. `content/announcements/2026-11-11-ai-quickstarts-launch.md`.
 
 Each announcement file uses this skeleton:
 
 ```markdown
 <!-- tone: serious | fun-quirky | concise -->
-<!-- template: templates/<name>.md -->
+<!-- template: content/templates/<name>.md -->
 
 ## Top-level post
 
@@ -95,7 +99,7 @@ comment lines at the top; they record provenance.
 - **Never invent facts.** Product names, dates, numbers, quotes, attributions,
   and links come only from the draft or from the user in conversation.
 - Missing link, date, or name → use `TBD` in a **draft** and list it as a gap in
-  your summary. A file in `announcements/` with `TBD` in it is not done.
+  your summary. A file in `content/announcements/` with `TBD` in it is not done.
 - Do not add offers, roadmap claims, or customer names that are not in the source.
 - Quotes must be verbatim from the draft, with the attribution exactly as given.
 - Do not post to Slack or send anything anywhere. Output is files only.
@@ -107,5 +111,5 @@ comment lines at the top; they record provenance.
 - [ ] Call to action and contact line present.
 - [ ] Emoji used as structure, not decoration noise.
 - [ ] Tone matches the chosen template; no mixed registers.
-- [ ] No invented facts, no placeholders left in `announcements/`.
+- [ ] No invented facts, no placeholders left in `content/announcements/`.
 - [ ] Filename follows `YYYY-MM-DD-<slug>.md`.

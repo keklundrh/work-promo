@@ -7,31 +7,31 @@ Two different kinds of templates live in this repo — don't mix them up:
 
 | | Who uses it | What it is |
 |---|---|---|
-| `drafts/00-draft-template.md` (this file) | **You**, the author | Input skeleton: raw material the AI needs |
-| `templates/` | **The AI agent** | Output templates: serious, fun/quirky, concise Slack formats |
+| `content/drafts/00-draft-template.md` (this file) | **You**, the author | Input skeleton: raw material the AI needs |
+| `content/templates/` | **The AI agent** | Output templates: serious, fun-quirky, concise Slack formats |
 
 ## The flow
 
 1. **Copy the skeleton** (everything below `THE SKELETON`) into a new file in
-   this folder, e.g. `drafts/ai-quickstarts.md`. One file per announcement topic.
+   this folder, e.g. `content/drafts/ai-quickstarts.md`. One file per announcement topic.
 2. **Fill it in.** Only real facts: the AI is not allowed to invent names, dates,
    numbers, quotes, or links. Whatever you write here is the single source of truth.
 3. **Missing something?** Leave `TBD`. `TBD` is fine in a draft — it just means
-   the AI will flag it as a gap. (`TBD` in `announcements/` is never fine.)
+   the AI will flag it as a gap. (`TBD` in `content/announcements/` is never fine.)
 4. **Tell the agent**, e.g.:
-   > Make an announcement from `drafts/ai-quickstarts.md`, tone: serious.
+   > Make an announcement from `content/drafts/ai-quickstarts.md`, tone: serious.
 5. The AI picks the matching template, writes the Slack announcement (top-level
-   post + thread reply) to `announcements/YYYY-MM-DD-<slug>.md`, and reports any
+   post + thread reply) to `content/announcements/YYYY-MM-DD-<slug>.md`, and reports any
    remaining gaps.
 6. **Review the output**, fix the gaps, copy it into Slack. The draft stays here
    as your source of record — keep or delete, it's scratch space.
 
 ## The rules, in one box
 
-- **Target is Slack.** Email examples in `examples/` are reference only.
+- **Target is Slack.** Email examples in `content/examples/` are reference only.
 - **Shape is always the same:** high-level top-level post (everything you need to
   know + the key link) with the detail in a thread reply — so people can comment
-  directly. See `examples/002.md` for the model.
+  directly. See `content/examples/002.md` for the model.
 - **The AI invents nothing.** Facts, quotes (verbatim), and attributions come
   from you, here or in chat.
 - **Output is a markdown file.** Nothing is ever posted anywhere by the AI.

@@ -2,10 +2,10 @@
 TEMPLATE: serious
 Use when:  launches, releases, subscription/pricing, partner-facing news
 Voice:     confident, factual. Emoji structure the post; at most one "!" per message.
-Reference: examples/002.md (link layers + bookmark CTA), examples/004.md (why-it-matters bullets)
+Reference: content/examples/002.md (link layers + bookmark CTA), content/examples/004.md (why-it-matters bullets)
 
 HOW TO USE (agent)
-1. Copy everything below the --- into announcements/YYYY-MM-DD-<slug>.md.
+1. Copy everything below the --- into content/announcements/YYYY-MM-DD-<slug>.md.
 2. Replace {{SLOTS}} with facts from the draft. Never invent (AGENTS.md § Grounding rules).
 3. Delete blocks marked OPTIONAL that the draft doesn't fill; repeat :white_check_mark: lines as the draft's facts support.
 4. Strip all HTML comments from the output, then run the AGENTS.md quality bar and report gaps.
@@ -14,7 +14,7 @@ HOW TO USE (agent)
 ---
 
 <!-- tone: serious -->
-<!-- template: templates/serious.md -->
+<!-- template: content/templates/serious.md -->
 
 ## Top-level post
 
