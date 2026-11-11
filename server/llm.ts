@@ -114,6 +114,7 @@ export function buildPrompt(tone: Tone, draft: DraftContent): { system: string; 
     '{"topLevelPost": string, "threadReply": string, "gaps": [{"field": string, "message": string}]}',
     'topLevelPost and threadReply are paste-ready Slack messages (mrkdwn, :emoji: codes).',
     'gaps lists facts the draft is missing (dates, links, quotes) — never invent them.',
+    'If the draft is missing facts, do NOT refuse: still write both parts using the available facts, put TBD markers where facts are absent, and list every missing fact in gaps.',
   ].join('\n\n')
 
   const user = [
@@ -131,8 +132,8 @@ export async function generateAnnouncement(tone: Tone, draft: DraftContent): Pro
     throw Object.assign(new Error('LLM not configured: set LLM_BASE_URL, LLM_API_KEY, LLM_MODEL'), { status: 503 })
   }
   const { system, user } = buildPrompt(tone, draft)
-  // Qwen3 reasons by default; /no_think is its documented soft switch to skip
-  // reasoning (a 27B model otherwise spends minutes before emitting content).
+  // Qwen3 still reasoned ~10K tokens despite the /no_think soft switch
+  // (measured: 187s); chat_template_kwargs is the hard switch (measured: 4s).
   const systemNoThink = '/no_think\n\n' + system
 
   const res = await fetch(`${LLM_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
@@ -145,6 +146,7 @@ export async function generateAnnouncement(tone: Tone, draft: DraftContent): Pro
         { role: 'user', content: user },
       ],
       temperature: 0.7,
+      chat_template_kwargs: { enable_thinking: false },
     }),
     signal: AbortSignal.timeout(300_000),
   })
