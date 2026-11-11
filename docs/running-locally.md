@@ -1,8 +1,9 @@
 # Running locally
 
 Everything runs in containers via `podman compose` — nothing installs on the
-host. Postgres holds the data; one app container serves both the API and the
-built UI.
+host. With the stack up, Postgres holds the data; one app container serves
+both the API and the built UI. Compose sets `LOCAL_USER=karl` so the browser
+gets a working identity without a proxy (change it there).
 
 ## Prerequisites
 
@@ -29,17 +30,15 @@ podman compose down --volumes   # also wipes the database
 ## Identity
 
 The app trusts the `x-forwarded-user` header, exactly what the OpenShift OAuth
-proxy injects in-cluster. Compose sets `USER_HEADER=x-forwarded-user`, and
-docker/podman do not inject it — so locally the API reports "unauthenticated"
-unless you send the header yourself. The SPA picks the local (browser) storage
-adapter whenever the API does not answer, so the UI still works without the
-backend.
+proxy injects in-cluster. The server resolves identity as: header →
+`LOCAL_USER` fallback → 401. Compose sets `LOCAL_USER=karl`, so the local
+stack is authenticated out of the box and everything you add is stored in
+Postgres as `karl`. Never set `LOCAL_USER` in-cluster — there the proxy path
+must 401 without a real header.
 
-To exercise the authenticated path locally:
-
-```bash
-curl -H 'x-forwarded-user: yourname' http://localhost:8080/api/whoami
-```
+The SPA picks the browser-local storage adapter only when the API is
+unreachable entirely (e.g. `vite dev` without the backend), so UI-only mode
+still works but keeps data in the browser.
 
 ## Layout
 

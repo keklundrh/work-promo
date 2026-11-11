@@ -6,22 +6,27 @@ let adapter: StorageAdapter | null = null
 let user: string | null = null
 let items: PromotionItem[] = []
 let loaded = false
-let bootStarted = false
+let bootPromise: Promise<void> | null = null
 const listeners = new Set<() => void>()
 
 function emit() {
   listeners.forEach((l) => l())
 }
 
-async function boot() {
-  bootStarted = true
-  const found = await detectStorage()
-  adapter = found.adapter
-  user = found.user
-  items = await adapter.listItems()
-  loaded = true
-  emit()
+function boot(): Promise<void> {
+  if (!bootPromise) {
+    bootPromise = (async () => {
+      const found = await detectStorage()
+      adapter = found.adapter
+      user = found.user
+      items = await adapter.listItems()
+      loaded = true
+      emit()
+    })()
+  }
+  return bootPromise
 }
+
 
 export function currentUser(): string | null {
   return user
@@ -35,14 +40,13 @@ export function useItems(): { items: PromotionItem[]; loaded: boolean } {
     },
     () => items,
   )
-  if (!bootStarted) void boot()
+  void boot()
   return { items: snapshot, loaded }
 }
 
 export async function getAdapter(): Promise<StorageAdapter> {
-  if (!bootStarted) await boot()
-  while (!adapter) await new Promise((r) => setTimeout(r, 20))
-  return adapter
+  await boot()
+  return adapter!
 }
 
 export async function upsertItem(item: PromotionItem) {

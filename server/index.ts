@@ -38,14 +38,17 @@ async function migrate() {
 const app = express()
 app.use(express.json({ limit: '2mb' }))
 
+const LOCAL_USER = process.env.LOCAL_USER ?? ''
+
 function currentUser(req: express.Request): string {
-  const user = req.header(USER_HEADER)
-  if (!user) {
-    const err = new Error('unauthenticated') as Error & { status?: number }
-    err.status = 401
-    throw err
-  }
-  return user
+  const header = req.header(USER_HEADER)
+  if (header) return header
+  // Local/compose runs have no OAuth proxy; LOCAL_USER names the dev user.
+  // Never set it in-cluster — without the header the proxy path must 401.
+  if (LOCAL_USER) return LOCAL_USER
+  const err = new Error('unauthenticated') as Error & { status?: number }
+  err.status = 401
+  throw err
 }
 
 const api = express.Router()

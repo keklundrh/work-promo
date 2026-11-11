@@ -23,8 +23,8 @@ services:
       PGDATABASE: workpromo
       PGUSER: workpromo
       PGPASSWORD: workpromo
-      # Local stand-in for the OpenShift OAuth proxy header
-      USER_HEADER: x-forwarded-user
+      # Local stand-in for the OAuth proxy: name the dev user
+      LOCAL_USER: karl
     ports:
       - "8080:8080"
     depends_on:
