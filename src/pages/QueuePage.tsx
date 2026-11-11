@@ -23,6 +23,7 @@ import type { ItemStatus, PromotionItem } from '../types'
 import { newItem } from '../model'
 import { useItems, upsertItem } from '../store'
 import { StatusLabel } from '../components/StatusLabel'
+import AddItemModal from '../components/AddItemModal'
 
 const OWNER = 'karl' // v1: no auth yet (Auth decision in #2 pending); hardcode current user
 
@@ -81,16 +82,27 @@ export default function QueuePage() {
 
   if (loaded && items.length === 0) {
     return (
-      <EmptyState titleText="No promotion items yet" headingLevel="h2" icon={SearchIcon}>
-        <EmptyStateBody>
-          Track everything the team wants to promote — from idea to posted announcement.
-        </EmptyStateBody>
-        <EmptyStateActions>
-          <Button variant="primary" onClick={() => setAddOpen(true)}>
-            Add item
-          </Button>
-        </EmptyStateActions>
-      </EmptyState>
+      <>
+        <EmptyState titleText="No promotion items yet" headingLevel="h2" icon={SearchIcon}>
+          <EmptyStateBody>
+            Track everything the team wants to promote — from idea to posted announcement.
+          </EmptyStateBody>
+          <EmptyStateActions>
+            <Button variant="primary" onClick={() => setAddOpen(true)}>
+              Add item
+            </Button>
+          </EmptyStateActions>
+        </EmptyState>
+        <AddItemModal
+          isOpen={addOpen}
+          onClose={() => setAddOpen(false)}
+          newTitle={newTitle}
+          onTitleChange={setNewTitle}
+          newDate={newDate}
+          onDateChange={setNewDate}
+          onAdd={handleAdd}
+        />
+      </>
     )
   }
 
@@ -155,31 +167,16 @@ export default function QueuePage() {
           )}
         </section>
       ))}
+      <AddItemModal
+        isOpen={addOpen}
+        onClose={() => setAddOpen(false)}
+        newTitle={newTitle}
+        onTitleChange={setNewTitle}
+        newDate={newDate}
+        onDateChange={setNewDate}
+        onAdd={handleAdd}
+      />
 
-      <Modal isOpen={addOpen} onClose={() => setAddOpen(false)} variant="small">
-        <ModalHeader title="Add promotion item" />
-        <ModalBody>
-          <Form>
-            <FormGroup label="Title" isRequired fieldId="add-title">
-              <TextInput id="add-title" value={newTitle} onChange={(_e, v) => setNewTitle(v)} />
-            </FormGroup>
-            <FormGroup label="Target date (optional)" fieldId="add-date">
-              <TextInput id="add-date" type="date" value={newDate} onChange={(_e, v) => setNewDate(v)} />
-            </FormGroup>
-            <p style={{ color: 'var(--pf-t--global--text--color--subtle)' }}>
-              New items start as <strong>Pending</strong>.
-            </p>
-          </Form>
-        </ModalBody>
-        <ModalFooter>
-          <Button key="add" variant="primary" onClick={handleAdd} isDisabled={!newTitle.trim()}>
-            Add
-          </Button>
-          <Button key="cancel" variant="link" onClick={() => setAddOpen(false)}>
-            Cancel
-          </Button>
-        </ModalFooter>
-      </Modal>
     </>
   )
 }
