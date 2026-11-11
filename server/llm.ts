@@ -131,6 +131,9 @@ export async function generateAnnouncement(tone: Tone, draft: DraftContent): Pro
     throw Object.assign(new Error('LLM not configured: set LLM_BASE_URL, LLM_API_KEY, LLM_MODEL'), { status: 503 })
   }
   const { system, user } = buildPrompt(tone, draft)
+  // Qwen3 reasons by default; /no_think is its documented soft switch to skip
+  // reasoning (a 27B model otherwise spends minutes before emitting content).
+  const systemNoThink = '/no_think\n\n' + system
 
   const res = await fetch(`${LLM_BASE_URL.replace(/\/$/, '')}/chat/completions`, {
     method: 'POST',
@@ -138,27 +141,34 @@ export async function generateAnnouncement(tone: Tone, draft: DraftContent): Pro
     body: JSON.stringify({
       model: LLM_MODEL,
       messages: [
-        { role: 'system', content: system },
+        { role: 'system', content: systemNoThink },
         { role: 'user', content: user },
       ],
       temperature: 0.7,
     }),
-    signal: AbortSignal.timeout(120_000),
+    signal: AbortSignal.timeout(300_000),
   })
   if (!res.ok) {
     const body = await res.text().catch(() => '')
     throw Object.assign(new Error(`LLM request failed: ${res.status} ${body.slice(0, 200)}`), { status: 502 })
   }
   const data = (await res.json()) as { choices?: { message?: { content?: string } }[] }
-  const content = data.choices?.[0]?.message?.content
-  if (!content) throw Object.assign(new Error('LLM returned no content'), { status: 502 })
+  const message = data.choices?.[0]?.message
+  const raw = (message && typeof message === 'object' && 'content' in message ? message.content : undefined) ?? ''
+  const reasoning = (message && typeof message === 'object' && 'reasoning_content' in message ? message.reasoning_content : undefined) ?? ''
+  const content = typeof raw === 'string' && raw.trim() ? raw : typeof reasoning === 'string' ? reasoning : ''
+  if (!content.trim()) throw Object.assign(new Error('LLM returned no content'), { status: 502 })
 
   return parseGeneration(content)
 }
 
 export function parseGeneration(content: string): GenerationResult {
-  // Tolerate models that wrap JSON in fences despite instructions.
-  const stripped = content.replace(/^```(?:json)?\s*/m, '').replace(/\s*```$/m, '').trim()
+  // Tolerate leaked <think…> blocks and ``` fences despite instructions.
+  const stripped = content
+    .replace(/<think[\s\S]*?<\/think>/gi, '')
+    .replace(/^```(?:json)?\s*/m, '')
+    .replace(/\s*```$/m, '')
+    .trim()
   let parsed: unknown
   try {
     parsed = JSON.parse(stripped)
