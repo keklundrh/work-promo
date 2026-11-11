@@ -22,7 +22,7 @@ edited wins.
 
 4. Reading and commenting on any issue is always allowed.
 5. Acting (writing code, creating files, opening/closing issues or PRs) is only
-   allowed on **sub-issues linked from an EPIC**. EPICs carry the `epic` label.
+   allowed on **sub-issues linked from an EPIC**. EPICs carry the `EPIC` label.
 6. No drive-by scope: every change must trace to a sub-issue (or an EPIC's
    acceptance criteria). No unrequested features, abstractions, refactors, or
    "improvements".
