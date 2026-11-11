@@ -15,11 +15,9 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table'
 import SearchIcon from '@patternfly/react-icons/dist/esm/icons/search-icon'
 import type { ItemStatus, PromotionItem } from '../types'
 import { newItem } from '../model'
-import { useItems, upsertItem } from '../store'
+import { useItems, upsertItem, currentUser } from '../store'
 import { StatusLabel } from '../components/StatusLabel'
 import AddItemModal from '../components/AddItemModal'
-
-const OWNER = 'karl' // v1: no auth yet (Auth decision in #2 pending); hardcode current user
 
 const GROUPS: { key: string; label: string; statuses: ItemStatus[] }[] = [
   { key: 'in-progress', label: 'In progress', statuses: ['draft', 'ready'] },
@@ -66,7 +64,7 @@ export default function QueuePage() {
   async function handleAdd() {
     const title = newTitle.trim()
     if (!title) return
-    const item = newItem(title, newDate, OWNER)
+    const item = newItem(title, newDate, currentUser() ?? 'unknown')
     await upsertItem(item)
     setAddOpen(false)
     setNewTitle('')

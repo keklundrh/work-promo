@@ -1,0 +1,35 @@
+services:
+  db:
+    image: quay.io/sclorg/postgresql-16-c9s:latest
+    environment:
+      POSTGRESQL_USER: workpromo
+      POSTGRESQL_PASSWORD: workpromo
+      POSTGRESQL_DATABASE: workpromo
+    volumes:
+      - pgdata:/var/lib/pgsql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U workpromo"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Containerfile
+    environment:
+      PGHOST: db
+      PGPORT: "5432"
+      PGDATABASE: workpromo
+      PGUSER: workpromo
+      PGPASSWORD: workpromo
+      # Local stand-in for the OpenShift OAuth proxy header
+      USER_HEADER: x-forwarded-user
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

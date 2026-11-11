@@ -19,7 +19,7 @@ import { TrashIcon } from '@patternfly/react-icons/dist/esm/icons/trash-icon'
 import type { DraftContent, LinkRow, PromotionItem, Tone } from '../types'
 import type { GateGap } from '../model'
 import { checkReadyGate } from '../model'
-import { storage } from '../storage'
+import { getAdapter } from '../store'
 import { StatusLabel } from '../components/StatusLabel'
 
 const FIELD_LABELS: Record<string, string> = {
@@ -63,12 +63,14 @@ export default function EditorPage() {
   useEffect(() => {
     if (!id) return
     let cancelled = false
-    void storage.getItem(id).then((it) => {
-      if (!cancelled) {
-        if (it) setItem(it)
-        else setMissing(true)
-      }
-    })
+    void getAdapter()
+      .then((a) => a.getItem(id))
+      .then((it: PromotionItem | undefined) => {
+        if (!cancelled) {
+          if (it) setItem(it)
+          else setMissing(true)
+        }
+      })
     return () => {
       cancelled = true
     }
@@ -105,7 +107,7 @@ export default function EditorPage() {
     if (!item) return
     const toSave = { ...item, updatedAt: new Date().toISOString() }
     if (statusAfterSave) toSave.status = statusAfterSave
-    await storage.saveItem(toSave)
+    await (await getAdapter()).saveItem(toSave)
     setItem(toSave)
     setDirty(false)
     setSavedAt(new Date().toLocaleTimeString())
@@ -144,7 +146,7 @@ export default function EditorPage() {
       return
     }
     const done = { ...item, slackUrl: url, updatedAt: new Date().toISOString() }
-    await storage.saveItem(done)
+    await (await getAdapter()).saveItem(done)
     setItem(done)
     setDirty(false)
     setSavedAt(new Date().toLocaleTimeString())
