@@ -10,8 +10,8 @@ import express from 'express'
 import pg from 'pg'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { generateAnnouncement, llmStatus } from './llm.ts'
-import type { DraftContent, Tone } from '../src/types.ts'
+import { generateAnnouncement, llmStatus, isDraftContent } from './llm.ts'
+import type { Tone } from '../src/types.ts'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -95,8 +95,8 @@ api.post('/items/:id/generate', async (req, res, next) => {
       return res.status(400).json({ error: 'item has no draft' })
     }
     const draft: unknown = item.draft
-    if (typeof draft !== 'object' || draft === null) {
-      return res.status(400).json({ error: 'item has no draft' })
+    if (!isDraftContent(draft)) {
+      return res.status(400).json({ error: 'item draft is malformed' })
     }
 
     // Tone: request body overrides the draft's stored tone; default serious.
@@ -106,18 +106,12 @@ api.post('/items/:id/generate', async (req, res, next) => {
       if (requested.tone === 'fun-quirky' || requested.tone === 'concise' || requested.tone === 'serious') {
         tone = requested.tone
       }
-    } else if (
-      'basics' in draft &&
-      typeof draft.basics === 'object' &&
-      draft.basics !== null &&
-      'tone' in draft.basics &&
-      typeof draft.basics.tone === 'string'
-    ) {
+    } else if (typeof draft.basics.tone === 'string' && draft.basics.tone !== '') {
       const stored = draft.basics.tone
       if (stored === 'fun-quirky' || stored === 'concise') tone = stored
     }
 
-    const result = await generateAnnouncement(tone, draft as DraftContent)
+    const result = await generateAnnouncement(tone, draft)
     const generatedAt = new Date().toISOString()
     const updated = { ...item, generated: { ...result, tone, generatedAt }, updatedAt: generatedAt }
     await pool.query(

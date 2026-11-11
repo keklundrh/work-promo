@@ -15,5 +15,6 @@ COPY --chown=1001:0 --from=build /app/dist /opt/app-root/app/public
 COPY --chown=1001:0 --from=build /app/node_modules /opt/app-root/app/node_modules
 COPY --chown=1001:0 --from=build /app/server /opt/app-root/app/server
 COPY --chown=1001:0 --from=build /app/content /opt/app-root/app/content
+COPY --chown=1001:0 --from=build /app/package.json ./
 EXPOSE 8080
 CMD ["node", "--experimental-strip-types", "server/index.ts"]

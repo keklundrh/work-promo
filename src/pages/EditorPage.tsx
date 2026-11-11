@@ -188,6 +188,7 @@ export default function EditorPage() {
           <Button
             variant="primary"
             onClick={() => {
+              if (!window.confirm('Save before generating? Generation always reads the saved draft.')) return
               void handleSave().then(() => navigate(`/items/${item.id}/generate`))
             }}
           >

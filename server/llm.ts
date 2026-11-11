@@ -59,6 +59,19 @@ function readAsset(...parts: string[]): string {
   return fs.readFileSync(path.join(contentRoot(), ...parts), 'utf8')
 }
 
+/** Best-effort: few-shot examples are optional (content/examples/ is gitignored). */
+function readExamples(files: string[]): string {
+  const parts: string[] = []
+  for (const f of files) {
+    try {
+      parts.push(`--- example: ${f} ---\n${readAsset(f)}`)
+    } catch {
+      // absent file (clean clone / in-cluster build): degrade to no examples
+    }
+  }
+  return parts.join('\n\n')
+}
+
 const TONE_FILE: Record<Tone, string> = {
   serious: 'templates/serious.md',
   'fun-quirky': 'templates/fun-quirky.md',
@@ -72,12 +85,26 @@ const FEW_SHOT: Record<Tone, string[]> = {
   concise: ['examples/004.md', 'examples/002.md'],
 }
 
+/** Runtime guard for the JSONB draft read from Postgres (external data). */
+export function isDraftContent(value: unknown): value is DraftContent {
+  if (typeof value !== 'object' || value === null) return false
+  const d = value as Record<string, unknown>
+  return (
+    'basics' in d && typeof d.basics === 'object' && d.basics !== null &&
+    Array.isArray(d.links) &&
+    Array.isArray(d.whyItMatters) &&
+    Array.isArray(d.quotes) &&
+    Array.isArray(d.resources) &&
+    typeof d.cta === 'string' &&
+    typeof d.contact === 'string' &&
+    typeof d.notes === 'string'
+  )
+}
+
 export function buildPrompt(tone: Tone, draft: DraftContent): { system: string; user: string } {
   const rules = readAsset('AGENTS.md')
   const template = readAsset(TONE_FILE[tone])
-  const examples = FEW_SHOT[tone]
-    .map((f) => `--- example: ${f} ---\n${readAsset(f)}`)
-    .join('\n\n')
+  const examples = readExamples(FEW_SHOT[tone])
 
   const system = [
     'You write internal product-promotion announcements for Slack.',
