@@ -24,6 +24,7 @@ HOW TO USE (agent)
 
 {{WHY_SENTENCE}}
 
+<!-- PRIMARY_LINK must be customer-facing; internal/partner-only links go in the thread reply's All links list, never here -->
 :arrow_right: {{PRIMARY_LINK_LABEL}}: {{PRIMARY_LINK}}
 
 {{CTA}}

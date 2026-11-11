@@ -44,5 +44,3 @@ quality bar and grounding rules.
 | [`templates/concise.md`](templates/concise.md) | Reminders, links-only shares | `examples/004.md` |
 
 Unsure which tone? Serious is the default.
-=======
-# work-promo
