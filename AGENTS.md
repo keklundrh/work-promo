@@ -26,44 +26,46 @@ edited wins.
 6. No drive-by scope: every change must trace to a sub-issue (or an EPIC's
    acceptance criteria). No unrequested features, abstractions, refactors, or
    "improvements".
+7. `main` is human-only. Agents NEVER commit or push to `main` and never merge
+   PRs into it. Agents commit to `dev` or a feature branch; humans merge into
+   `main`. Applies to all work in this repo, including `content/`.
 
 ## EPICs and sub-issues
 
-7. Sub-issues are the unit of work; the EPIC is the tracker.
+8. Sub-issues are the unit of work; the EPIC is the tracker.
    - A sub-issue closes only via a merged PR that implements it and references
      the sub-issue number.
-   - Sub-issues are never completed "on their own" (no direct commits to
-     default branch, no closing without a PR).
+   - Sub-issues are never completed "on their own" (no closing without a PR).
    - The EPIC closes only when all its sub-issues are closed **and** its
      acceptance criteria are demonstrably met.
-8. Agents never edit EPIC scope. To change a requirement, comment on the EPIC
+9. Agents never edit EPIC scope. To change a requirement, comment on the EPIC
    proposing the change and wait for a human.
 
 ## Traceability and verification
 
-9. Every commit and PR references the sub-issue it implements (`#123` in the
+10. Every commit and PR references the sub-issue it implements (`#123` in the
    message or PR body). Orphan changes are not allowed.
-10. Nothing closes without verification evidence: run the changed surface, or
+11. Nothing closes without verification evidence: run the changed surface, or
     the failing test/one-off script that proves it. Report what was run and
     what it showed.
 
 ## Documentation
 
-11. Documentation lives in `docs/`.
-12. Written for the **end consumer** (a person using the app or repo), never
+12. Documentation lives in `docs/`.
+13. Written for the **end consumer** (a person using the app or repo), never
     for AI.
-13. No specs in docs — specifications live in issues. Usage/how-to lives only
-    in docs. This pairing keeps rule 15 enforceable.
-14. Concise. Every sentence earns its place.
-15. No duplicate information anywhere in `docs/` — each fact has exactly one
+14. No specs in docs — specifications live in issues. Usage/how-to lives only
+    in docs. This pairing keeps rule 16 enforceable.
+15. Concise. Every sentence earns its place.
+16. No duplicate information anywhere in `docs/` — each fact has exactly one
     home.
-16. Create a new doc file only for a genuinely new topic whose content is not
+17. Create a new doc file only for a genuinely new topic whose content is not
     already covered elsewhere; otherwise extend the existing file.
 
 ## Secrets and internal content
 
-17. Never commit tokens, keys, or connection strings. Cluster config belongs in
+18. Never commit tokens, keys, or connection strings. Cluster config belongs in
     OpenShift secrets; local overrides in a gitignored `.env`.
-18. Docs and code must never contain Red Hat-internal announcement content.
+19. Docs and code must never contain Red Hat-internal announcement content.
     Material under `content/examples/` is internal and must not be copied into
     docs, tests, screenshots, or fixtures.
