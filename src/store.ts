@@ -22,10 +22,10 @@ export function useItems(): { items: PromotionItem[]; loaded: boolean } {
       listeners.add(cb)
       return () => listeners.delete(cb)
     },
-    () => loaded,
+    () => items,
   )
   if (!loaded) void refresh()
-  return { items, loaded: snapshot && loaded }
+  return { items: snapshot, loaded }
 }
 
 export async function upsertItem(item: PromotionItem) {
