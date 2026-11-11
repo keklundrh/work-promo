@@ -6,7 +6,7 @@ import {
   Page,
   PageSection,
 } from '@patternfly/react-core'
-import FedoraIcon from '@patternfly/react-icons/dist/esm/icons/fedora-icon'
+import RedhatIcon from '@patternfly/react-icons/dist/esm/icons/redhat-icon'
 import QueuePage from './pages/QueuePage'
 import EditorPage from './pages/EditorPage'
 import GenerationPage from './pages/GenerationPage'
@@ -22,7 +22,7 @@ export default function App() {
           <MastheadMain>
             <MastheadBrand>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FedoraIcon color="#e00" width={28} height={28} />
+                <RedhatIcon color="#e00" width={28} height={28} />
                 <span style={{ fontWeight: 600, fontSize: '1.1rem' }}>{APP_NAME}</span>
               </span>
             </MastheadBrand>
