@@ -36,6 +36,9 @@ edited wins.
    - A sub-issue closes only via a merged PR that implements it and references
      the sub-issue number.
    - Sub-issues are never completed "on their own" (no closing without a PR).
+   - Decision/definition sub-issues (issues that record decisions rather than
+     ship code) close when the decision is recorded in the issue itself; they
+     do not require a PR.
    - The EPIC closes only when all its sub-issues are closed **and** its
      acceptance criteria are demonstrably met.
 9. Agents never edit EPIC scope. To change a requirement, comment on the EPIC
